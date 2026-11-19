@@ -568,7 +568,7 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 		key := d.Val()
 		var value string
 
-		// Load-bearing, do not turn this into an error: the first token the
+		// Do not turn this into an error: the first token the
 		// dispenser yields is the module name `s3` from `storage s3 {`,
 		// which has no argument of its own. Erroring here breaks the whole
 		// block with "wrong argument count or unexpected line ending after

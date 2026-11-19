@@ -190,9 +190,15 @@ test-e2e: ## run the end-to-end tests (brings the stack up against RustFS)
 
 # -- Vendored Caddy plugin
 
+# go get -u raises quic-go past what Caddy builds with: v0.65.0 removed
+# http3/qlog.DefaultConnectionTracer, which Caddy v2.11.9 calls. Drop the hold
+# once a Caddy release requires a newer quic-go.
+QUIC_GO_HOLD        = v0.64.1
+
 vendor-update: ## update, vet and test the vendored certmagic-s3 plugin
 	@docker run --rm -v $(PWD)/caddy/certmagic-s3:/src -w /src $(GO_IMAGE) sh -c '\
-		go get -u ./... && go mod tidy && ! gofmt -l . | grep . && go vet ./... && go test -race ./...'
+		go get -u ./... && go get github.com/quic-go/quic-go@$(QUIC_GO_HOLD) && go mod tidy && \
+		! gofmt -l . | grep . && go vet ./... && go test -race ./...'
 	@echo "$(BOLD)Re-apply any LOCAL CHANGE hunks upstream has moved under.$(RESET)"
 .PHONY: vendor-update
 

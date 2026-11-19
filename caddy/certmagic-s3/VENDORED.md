@@ -46,7 +46,7 @@ time. The fork parsed a timestamp out of the lock body instead.
 `LockExpiration` is now 2 minutes, up from the fork's 15 seconds. A live
 holder keeps its lock for as long as it needs, because it heartbeats
 regardless of this value. The longer expiration only slows down taking over
-a lock that is genuinely abandoned.
+a lock that is really abandoned.
 
 A reload pays for this: `Cleanup()` leaves the lock object in place, so the
 incoming instance waits up to two minutes to reclaim it.

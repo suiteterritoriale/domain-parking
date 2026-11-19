@@ -253,10 +253,12 @@
         </div>
 
         <div class="rows">
+          {{- if .Email }}
           <a class="row" href="mailto:{{ .Email }}">
             <span class="label">Contact de la mairie</span>
             <span class="value accent">{{ .Email }}</span>
           </a>
+          {{- end }}
 
           <a class="row" href="{{ .ServicePublicURL }}" rel="noopener">
             <span class="label">Plus d'informations (horaires, adresse, services, ...)</span>

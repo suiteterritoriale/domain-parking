@@ -47,13 +47,11 @@ A registry can re-push a tag; a digest that moved is a legitimate update.
   set of registered modules changed. Do not just regenerate it. Tell the user
   which modules appeared or went away, and why (`go mod why`), first.
 - `TESTING.md` quotes the Go image twice. Update both.
-- `quic-go`: `go get -u` in the vendored module can raise it past the
-  version that Caddy compiles with. `make vendor-update` then fails at
-  `go vet`. v0.65.0 removed `http3/qlog.DefaultConnectionTracer`, which Caddy
-  v2.11.9 calls. Hold it at the newest version that builds, with
-  `go get github.com/quic-go/quic-go@<version>` and `go mod tidy` in
-  `caddy/certmagic-s3/`. It is held at v0.64.1. Remove the hold when a Caddy
-  release requires a newer version.
+- `quic-go`: `make vendor-update` holds it at `QUIC_GO_HOLD` in the
+  `Makefile`, because `go get -u` would raise it past the version Caddy
+  compiles with. After a Caddy upgrade, raise the hold to the newest version
+  that builds, or remove it once the Caddy release requires a newer version
+  itself. Tell the user which one you did.
 
 ## Tests and the CVE gate
 

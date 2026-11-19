@@ -111,6 +111,23 @@ func TestThePageContent(t *testing.T) {
 	}
 }
 
+func TestWithoutAnEmailTheContactRowIsLeftOut(t *testing.T) {
+	site := brigny
+	site.Email = ""
+	dir := t.TempDir()
+	mustBuild(t, []Site{site}, dir)
+	content := pageOf(t, dir, "www.brigny.fr")
+
+	for _, unwanted := range []string{"mailto:", "Contact de la mairie"} {
+		if strings.Contains(content, unwanted) {
+			t.Errorf("the page contains %q", unwanted)
+		}
+	}
+	if !strings.Contains(content, `href="https://lannuaire.service-public.fr/mairie-87030-01" rel=noopener`) {
+		t.Error("the other rows are missing")
+	}
+}
+
 // Reached by typing the domain, not from search: the authoritative record is
 // the Service-Public listing, so the page stays out of the index. Crawling is
 // still allowed (in the Caddyfile) or the noindex is never read.

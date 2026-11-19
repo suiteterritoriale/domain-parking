@@ -316,7 +316,9 @@ A bare list of domain objects is also accepted.
 
 **All six fields are mandatory, and no others are allowed.** A half-filled
 entry would render a page with gaps in it, which is worse than a build that
-refuses to run. Every value is validated — the domain as a hostname, the
+refuses to run. The one exception is `email`, which may be `null` or `""`
+(the key must still be present): the page then leaves out the contact row. Every value
+is validated — the domain as a hostname, the
 zipcode as 5 digits, the SIRET as 14, the email as a plain address (letters,
 digits, `.`, `_`, `+`, `-`: `?`, `&`, `=` or `%` would add headers to the
 `mailto:` link), and

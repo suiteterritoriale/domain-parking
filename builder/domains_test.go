@@ -130,6 +130,33 @@ func TestAnUppercaseEmailDomainIsAccepted(t *testing.T) {
 	}
 }
 
+func TestANullOrBlankEmailIsAccepted(t *testing.T) {
+	for _, value := range []any{nil, "", "   "} {
+		sites := mustLoad(t, write(t, []any{with(map[string]any{"email": value})}))
+
+		if sites[0].Email != "" {
+			t.Errorf("%#v: got %q", value, sites[0].Email)
+		}
+	}
+}
+
+// The key stays mandatory, and a non-string value is still a mistake
+// upstream.
+func TestAnEmailMustBeNullOrAString(t *testing.T) {
+	for _, value := range []any{42, []any{"x"}, map[string]any{}} {
+		loadFails(t, write(t, []any{with(map[string]any{"email": value})}), "`email` must be null or a string")
+	}
+}
+
+func TestOnlyTheEmailIsNullable(t *testing.T) {
+	for _, field := range fields {
+		if field == "email" {
+			continue
+		}
+		loadFails(t, write(t, []any{with(map[string]any{field: nil})}), "`"+field+"` must be a non-empty string")
+	}
+}
+
 func TestEveryFieldIsMandatory(t *testing.T) {
 	for _, field := range fields {
 		entry := valid()

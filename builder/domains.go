@@ -4,9 +4,10 @@ package main
 //
 // The domain list carries data only. Every piece of wording, every label and
 // every fixed URL lives in the template, so a copy change never means touching
-// the schema, and a domain entry stays six fields long. All six are mandatory:
-// a half-filled entry would render a page with gaps in it, which is worse than
-// a build that refuses to run.
+// the schema, and a domain entry stays six fields long. All six keys are
+// mandatory: a half-filled entry would render a page with gaps in it, which is
+// worse than a build that refuses to run. Only `email` may be null or blank,
+// which hides the contact row.
 
 import (
 	"context"
@@ -36,6 +37,10 @@ var fields = []string{
 	"service_public_url",
 	"siret",
 }
+
+// nullable are the fields whose value may be null or blank. They are then
+// left empty and skip their pattern.
+var nullable = map[string]bool{"email": true}
 
 // label is one DNS label. Deliberately strict: the domain becomes a directory
 // name that Caddy resolves against the Host header, so anything exotic is
@@ -92,7 +97,8 @@ type Site struct {
 	Domain         string
 	CommuneName    string
 	CommuneZipcode string
-	Email          string
+	// Email is empty when the list gives null or a blank string.
+	Email string
 	// ServicePublicURL is the listing on lannuaire.service-public.fr or
 	// lannuaire.service-public.gouv.fr.
 	ServicePublicURL string
@@ -168,8 +174,8 @@ func parseSite(raw any, index int) (Site, error) {
 		return Site{}, fmt.Errorf("%s must be an object", where)
 	}
 
-	// One check covers both missing and unexpected keys, since all six
-	// fields are mandatory and there are no optional ones.
+	// One check covers both missing and unexpected keys, since all six keys
+	// are mandatory, nullable ones included.
 	keys := make([]string, 0, len(object))
 	for key := range object {
 		keys = append(keys, key)
@@ -182,9 +188,17 @@ func parseSite(raw any, index int) (Site, error) {
 
 	values := make(map[string]string, len(fields))
 	for _, field := range fields {
-		value, ok := object[field].(string)
+		raw := object[field]
+		if raw == nil && nullable[field] {
+			raw = ""
+		}
+		value, ok := raw.(string)
 		value = strings.TrimSpace(value)
-		if !ok || value == "" {
+		if nullable[field] {
+			if !ok {
+				return Site{}, fmt.Errorf("%s: `%s` must be null or a string", where, field)
+			}
+		} else if !ok || value == "" {
 			return Site{}, fmt.Errorf("%s: `%s` must be a non-empty string", where, field)
 		}
 		values[field] = value
@@ -203,6 +217,9 @@ func parseSite(raw any, index int) (Site, error) {
 	}
 
 	for _, p := range patterns {
+		if values[p.field] == "" && nullable[p.field] {
+			continue
+		}
 		if !p.re.MatchString(values[p.field]) {
 			return Site{}, fmt.Errorf("%s: `%s` must be %s, got %q", where, p.field, p.expected, values[p.field])
 		}
