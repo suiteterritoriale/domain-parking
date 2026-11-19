@@ -6,10 +6,10 @@
 # in the repo. See certmagic-s3/VENDORED.md for the local changes on top of
 # upstream.
 
-# Digests resolved on 2026-10-21. GO_IMAGE is also pinned in the Makefile and
+# Digests resolved on 2026-11-18. GO_IMAGE is also pinned in the Makefile and
 # builder/Dockerfile.
-ARG GO_IMAGE=golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc
-ARG DISTROLESS_STATIC_IMAGE=gcr.io/distroless/static-debian13:nonroot@sha256:d62067879de890a1def9da0e7766b7d20810a5e5555cef8506b752437d7a3e88
+ARG GO_IMAGE=golang:1.27.4@sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb9f907977686c126cf
+ARG DISTROLESS_STATIC_IMAGE=gcr.io/distroless/static-debian13:nonroot@sha256:aafe993665bf6200db38a02c11a9351e782a84b6a45e7f33b6695638c88e3931
 
 FROM ${GO_IMAGE} AS build
 
